@@ -1,20 +1,12 @@
-import type { CapacitorConfig } from '@capacitor/cli'
+import type { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'com.parasclotheemporium.app',
   appName: 'Paras Clothe Emporium',
   webDir: 'dist',
   server: {
-    androidScheme: 'https',
-  },
-  android: {
-    allowMixedContent: true,
-  },
-  plugins: {
-    SplashScreen: {
-      launchShowDuration: 0,
-    },
-  },
-}
+    androidScheme: 'https'
+  }
+};
 
-export default config
+export default config;
