@@ -8,27 +8,20 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 50
+    timeout-minutes: 45
 
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-node@v4
+      - uses: oven-sh/setup-bun@v2
         with:
-          node-version: '20'
+          bun-version: latest
 
-      - name: Install JS dependencies
-        run: |
-          npm config set fetch-retries 5
-          npm config set fetch-retry-mintimeout 20000
-          npm config set fetch-retry-maxtimeout 120000
-          npm install --no-audit --no-fund --prefer-online --registry https://registry.npmjs.org/
-          echo "=== node_modules/.bin ==="
-          ls node_modules/.bin/ | head -20
-          npx --yes vite --version
+      - name: Install dependencies with Bun
+        run: bun install
 
       - name: Build React app
-        run: npx vite build
+        run: bunx vite build
 
       - uses: actions/setup-java@v4
         with:
@@ -39,8 +32,8 @@ jobs:
 
       - name: Capacitor Android
         run: |
-          npx cap add android
-          npx cap sync android
+          bunx cap add android
+          bunx cap sync android
 
       - name: Gradle assembleDebug
         working-directory: android
