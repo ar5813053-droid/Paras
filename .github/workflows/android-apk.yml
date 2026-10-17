@@ -16,14 +16,13 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
 
       - name: Install JS dependencies
         run: |
-          npm install --no-audit --no-fund --no-optional || npm install --no-audit --no-fund --force
-          # Verify key binaries exist
-          ls node_modules/.bin/vite || echo "vite binary missing"
-          ls node_modules/vite || echo "vite package missing"
+          npm install --no-audit --no-fund --no-optional --prefer-online
+          echo "=== Checking vite ==="
+          ls -la node_modules/.bin/vite || true
+          npx vite --version || true
 
       - name: Build React app
         run: npx vite build
