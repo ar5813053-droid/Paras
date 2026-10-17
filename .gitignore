@@ -4,7 +4,6 @@ node_modules
 .pnp.js
 
 # Build
-dist
 dist-ssr
 *.local
 android/app/build
@@ -39,3 +38,4 @@ npm-debug.log*
 
 # TypeScript
 *.tsbuildinfo
+# dist is committed for reliable CI builds
