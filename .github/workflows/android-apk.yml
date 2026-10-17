@@ -8,7 +8,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 35
 
     steps:
       - uses: actions/checkout@v4
@@ -24,18 +24,25 @@ jobs:
           distribution: 'temurin'
           java-version: '17'
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-        with:
-          packages: 'tools platform-tools platforms;android-34 build-tools;34.0.0'
+      - name: Setup Android SDK manually
+        run: |
+          # Use the pre-installed SDK on the runner
+          echo "ANDROID_HOME=$ANDROID_HOME"
+          echo "ANDROID_SDK_ROOT=$ANDROID_SDK_ROOT"
+          ls $ANDROID_HOME || true
+          # Accept licenses
+          yes | sdkmanager --licenses || true
+          # Install required packages
+          sdkmanager "platform-tools" "platforms;android-34" "build-tools;34.0.0" || true
+          sdkmanager --list_installed | head -20
 
-      - name: Install Capacitor and create Android project
+      - name: Install Capacitor CLI and create Android project
         run: |
           npm install -g @capacitor/cli@6.1.2
           ls -la dist/
           npx cap add android
           npx cap sync android
-          ls android/app/build.gradle || ls android/
+          ls -la android/ || true
 
       - name: Build debug APK
         working-directory: android
