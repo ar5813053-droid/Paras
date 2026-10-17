@@ -1,4 +1,4 @@
-# Paras Clothe Emporium
+Paras Clothe Emporium
 
 **Your Style, Your Store.**
 
