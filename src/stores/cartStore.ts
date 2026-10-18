@@ -1,27 +1,16 @@
 import { create } from 'zustand'
 import { persist } from 'zustand/middleware'
-
-export interface CartItem {
-  productId: string
-  variantId: string | null
-  title: string
-  articleNo: string
-  imageUrl: string | null
-  unitPrice: number
-  mrp: number
-  quantity: number
-  size: string | null
-  unit: string
-}
+import type { CartItem } from '../types'
 
 interface CartState {
   items: CartItem[]
   addItem: (item: Omit<CartItem, 'quantity'> & { quantity?: number }) => void
-  removeItem: (productId: string, variantId: string | null) => void
-  updateQuantity: (productId: string, variantId: string | null, quantity: number) => void
-  clearCart: () => void
+  removeItem: (productId: string, size: string) => void
+  updateQty: (productId: string, size: string, qty: number) => void
+  clear: () => void
   totalItems: () => number
   subtotal: () => number
+  savings: () => number
 }
 
 export const useCartStore = create<CartState>()(
@@ -30,45 +19,50 @@ export const useCartStore = create<CartState>()(
       items: [],
       addItem: (item) => {
         const qty = item.quantity ?? 1
-        set((state) => {
-          const existing = state.items.find(
-            (i) => i.productId === item.productId && i.variantId === item.variantId
+        set((s) => {
+          const existing = s.items.find(
+            (i) => i.productId === item.productId && i.size === item.size
           )
           if (existing) {
             return {
-              items: state.items.map((i) =>
-                i.productId === item.productId && i.variantId === item.variantId
+              items: s.items.map((i) =>
+                i.productId === item.productId && i.size === item.size
                   ? { ...i, quantity: i.quantity + qty }
                   : i
               ),
             }
           }
-          return { items: [...state.items, { ...item, quantity: qty }] }
+          return { items: [...s.items, { ...item, quantity: qty }] }
         })
       },
-      removeItem: (productId, variantId) => {
-        set((state) => ({
-          items: state.items.filter(
-            (i) => !(i.productId === productId && i.variantId === variantId)
+      removeItem: (productId, size) =>
+        set((s) => ({
+          items: s.items.filter(
+            (i) => !(i.productId === productId && i.size === size)
           ),
-        }))
-      },
-      updateQuantity: (productId, variantId, quantity) => {
-        if (quantity <= 0) {
-          get().removeItem(productId, variantId)
+        })),
+      updateQty: (productId, size, qty) => {
+        if (qty <= 0) {
+          get().removeItem(productId, size)
           return
         }
-        set((state) => ({
-          items: state.items.map((i) =>
-            i.productId === productId && i.variantId === variantId
-              ? { ...i, quantity }
+        set((s) => ({
+          items: s.items.map((i) =>
+            i.productId === productId && i.size === size
+              ? { ...i, quantity: qty }
               : i
           ),
         }))
       },
-      clearCart: () => set({ items: [] }),
+      clear: () => set({ items: [] }),
       totalItems: () => get().items.reduce((sum, i) => sum + i.quantity, 0),
-      subtotal: () => get().items.reduce((sum, i) => sum + i.unitPrice * i.quantity, 0),
+      subtotal: () =>
+        get().items.reduce((sum, i) => sum + i.unitPrice * i.quantity, 0),
+      savings: () =>
+        get().items.reduce(
+          (sum, i) => sum + (i.mrp - i.unitPrice) * i.quantity,
+          0
+        ),
     }),
     { name: 'paras-cart' }
   )
