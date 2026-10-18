@@ -2,10 +2,6 @@
   "name": "paras-clothe-emporium",
   "private": true,
   "version": "1.0.0",
-  "type": "module",
-  "scripts": {
-    "build": "echo 'using committed dist'"
-  },
   "dependencies": {
     "@capacitor/android": "6.1.2",
     "@capacitor/core": "6.1.2"
